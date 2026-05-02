@@ -1,4 +1,4 @@
-import { CreateTransactionDialog } from "@/components/create-transaction-dialog";
+import { TransactionDialog } from "@/components/create-transaction-dialog";
 import {
   Select,
   SelectContent,
@@ -27,13 +27,15 @@ export const TransactionsPage: React.FC = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <CreateTransactionDialog />
         </div>
         <div className="flex flex-col gap-4">
           <TransactionItem type="Receita" />
           <TransactionItem type="Despesa" />
           <TransactionItem type="Receita" />
           <TransactionItem type="Despesa" />
+        </div>
+        <div className="self-end">
+          <TransactionDialog action="edit" />
         </div>
       </div>
     </div>

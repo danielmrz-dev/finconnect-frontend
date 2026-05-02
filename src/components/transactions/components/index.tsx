@@ -22,7 +22,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ type }) => {
       </div>
       <div>
         <p className={`text-xs font-extrabold justify-self-end ${isReceita ? "text-green-500" : "text-red-400"}`}>
-          {isReceita ? "+" : "-"} {formatToBRL(250)}
+          {isReceita ? "+" : "-"} {formatToBRL("250")}
         </p>
         <p className="text-xs justify-self-end opacity-60">
           19 ago 2024

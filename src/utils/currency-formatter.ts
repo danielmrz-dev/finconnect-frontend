@@ -1,6 +1,9 @@
-export const formatToBRL = (value: number): string => {
-  return Intl.NumberFormat("pt-BR", {
+export const formatToBRL = (value: string): string => {
+  const digits = value.replace(/\D/g, "");
+  const number = (Number(digits) / 100);
+
+  return new Intl.NumberFormat("pt-BR", {
     currency: "BRL",
     style: "currency",
-  }).format(value);
+  }).format(number);
 };

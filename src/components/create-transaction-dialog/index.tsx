@@ -9,72 +9,176 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { TransactionType } from "@/types/transaction.type";
+import { formatToBRL } from "@/utils/currency-formatter";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
+} from "../ui/select";
+import { formSchema } from "./form/new-transaction-form";
 
-export const CreateTransactionDialog: React.FC = () => {
-  const [inputValue, setInputValue] = useState<string>("");
+type TransactionDialogProps = {
+  action: "create" | "edit";
+};
+
+export const TransactionDialog: React.FC<TransactionDialogProps> = ({
+  action,
+}) => {
+  const [amount, setAmount] = useState<string>("");
+
+  const isCreationDialog = action === "create";
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      tipo:  isCreationDialog ? "Receita" : "Despesa",
+      descricao: isCreationDialog ? "" : "Transação editada",
+      valor: isCreationDialog ? 0 : 0,
+    },
+  });
+
+  
+
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log(data);
+  };
 
   return (
     <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">Cadastrar nova transação</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Nova transação</DialogTitle>
-            <DialogDescription>
-              Cadastre uma nova transação para que ela apareça na lista.
-            </DialogDescription>
-          </DialogHeader>
+      <DialogTrigger asChild>
+        <Button variant="outline">Cadastrar nova transação</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            {isCreationDialog ? "Nova transação" : "Editar transação"}
+          </DialogTitle>
+          <DialogDescription>
+            {isCreationDialog ? "Cadastre uma nova transação para que ela apareça na lista." : "Altere os dados desta transação para atualizá-la."}
+            
+          </DialogDescription>
+        </DialogHeader>
+
+        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
-            <Field>
-              <Label htmlFor="tipo">Tipo</Label>
-              <Select onValueChange={() => {}}>
-                <SelectTrigger className="w-45 self-end">
-                  <SelectValue placeholder="Escolha o tipo da transação" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="Receitas">Receita</SelectItem>
-                    <SelectItem value="Despesas">Despesa</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field>
-              <Label htmlFor="name-1">Descrição</Label>
-              <Input id="name-1" name="name" />
-            </Field>
-            <Field>
-              <Label htmlFor="valor">Valor</Label>
-              <Input
-                value={inputValue}
-                id="valor"
-                name="valor"
-                onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-              />
-            </Field>
+            <Controller
+              name="tipo"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-complex-billingPeriod">
+                    Tipo
+                  </FieldLabel>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-complex-billingPeriod"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Selecione o tipo de transação" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={TransactionType.RECEITA}>
+                        Receita
+                      </SelectItem>
+                      <SelectItem value={TransactionType.DESPESA}>
+                        Despesa
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="descricao"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-demo-title">
+                    Descrição
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-demo-title"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Descreva brevemente a transação"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="valor"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-demo-title">Valor</FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-demo-title"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    value={amount}
+                    onChange={({ currentTarget }) => {
+                      const formatted = formatToBRL(currentTarget.value);
+                      const numeric =
+                        Number(currentTarget.value.replace(/\D/g, "")) / 100;
+                      setAmount(formatted);
+                      field.onChange(numeric);
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
           </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
-            <Button type="submit">Cadastrar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+
+        <DialogFooter className="flex flex-row">
+          <DialogClose asChild>
+            <Field>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+                className="max-w-fit self-end"
+              >
+                Cancelar
+              </Button>
+            </Field>
+          </DialogClose>
+          {action === "create" && (
+            <Button type="submit" form="form-rhf-demo" className="w-fit">
+              Cadastrar
+            </Button>
+          )}
+          {action === "edit" && (
+            <Button type="submit" form="form-rhf-demo" className="w-fit">
+              Confirmar edição
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

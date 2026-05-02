@@ -3,7 +3,7 @@ import { formatToBRL } from "../../utils/currency-formatter";
 
 type BalanceCardProps = {
   title: string;
-  amount: number;
+  amount: string;
   cardBgColor: "light" | "dark";
 };
 
