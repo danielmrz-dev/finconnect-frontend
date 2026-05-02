@@ -13,10 +13,10 @@ export const Transactions: React.FC = () => {
           <GoChevronRight />
         </Link>
       </div>
-      <TransactionItem/>
-      <TransactionItem/>
-      <TransactionItem/>
-      <TransactionItem/>
+      <TransactionItem type="Receita"/>
+      <TransactionItem type="Despesa"/>
+      <TransactionItem type="Receita"/>
+      <TransactionItem type="Despesa"/>
     </div>
   );
 };
