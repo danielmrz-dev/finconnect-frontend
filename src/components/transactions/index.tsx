@@ -1,7 +1,6 @@
 import { GoChevronRight } from "react-icons/go";
 import { Link } from "react-router";
 import { Paths } from "../../routes";
-import { TransactionItem } from "./components";
 
 export const Transactions: React.FC = () => {
   return (
@@ -16,16 +15,7 @@ export const Transactions: React.FC = () => {
           <GoChevronRight />
         </Link>
       </div>
-      <div className="flex flex-col gap-4">
-        <TransactionItem type="Receita" />
-        <TransactionItem type="Despesa" />
-        <TransactionItem type="Receita" />
-        <TransactionItem type="Despesa" />
-        <TransactionItem type="Receita" />
-        <TransactionItem type="Despesa" />
-        <TransactionItem type="Receita" />
-        <TransactionItem type="Despesa" />
-      </div>
+      <div className="flex flex-col gap-4"></div>
     </div>
   );
 };

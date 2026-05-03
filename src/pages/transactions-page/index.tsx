@@ -1,3 +1,4 @@
+import { Loader } from "@/components/loader";
 import { TransactionDialog } from "@/components/transaction-dialog";
 import {
   Select,
@@ -7,9 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTransactions } from "@/hooks/useTransactions";
 import { TransactionItem } from "../../components/transactions/components";
+import { EmptyState } from "@/components/empty-state";
 
 export const TransactionsPage: React.FC = () => {
+  const { transactions, isTransactionsLoading } = useTransactions();
+
   return (
     <div className="p-4 flex flex-col gap-4">
       <h1 className="font-bold text-3xl">Transações</h1>
@@ -29,13 +34,27 @@ export const TransactionsPage: React.FC = () => {
           </Select>
         </div>
         <div className="flex flex-col gap-4">
-          <TransactionItem type="Receita" />
-          <TransactionItem type="Despesa" />
-          <TransactionItem type="Receita" />
-          <TransactionItem type="Despesa" />
+          {isTransactionsLoading && <Loader />}
+          {transactions && transactions.length > 1 &&
+            transactions.map((transaction) => {
+              return (
+                <TransactionItem
+                  key={transaction.id}
+                  transaction={transaction}
+                />
+              );
+            })}
+          {
+            transactions && transactions.length <= 0
+            && 
+            <EmptyState/>
+          }
         </div>
         <div className="self-end">
-          <TransactionDialog action="create" buttonText="Criar nova transação" />
+          <TransactionDialog
+            action="create"
+            buttonText="Criar nova transação"
+          />
         </div>
       </div>
     </div>

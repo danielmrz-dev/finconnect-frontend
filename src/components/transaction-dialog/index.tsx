@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TransactionType } from "@/types/transaction.type";
+import { TransactionType } from "@/types/transaction-type";
 import { formatToBRL } from "@/utils/currency-formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
