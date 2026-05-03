@@ -1,4 +1,4 @@
-import { TransactionDialog } from "@/components/create-transaction-dialog";
+import { TransactionDialog } from "@/components/transaction-dialog";
 import {
   Select,
   SelectContent,
@@ -35,7 +35,7 @@ export const TransactionsPage: React.FC = () => {
           <TransactionItem type="Despesa" />
         </div>
         <div className="self-end">
-          <TransactionDialog action="edit" />
+          <TransactionDialog action="create" buttonText="Criar nova transação" />
         </div>
       </div>
     </div>
