@@ -4,20 +4,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { ITransaction } from "@/types/transaction";
+import { ETransactionType } from "@/types/transaction-type";
 import { Edit, Trash2Icon } from "lucide-react";
 import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
 import profilePicture from "../../../assets/profile-picture.png";
 import { formatToBRL } from "../../../utils/currency-formatter";
-import type { Transaction } from "@/types/transaction";
-import { TransactionType } from "@/types/transaction-type";
 
 type TransactionItemProps = {
-  transaction: Transaction;
+  transaction: ITransaction;
 };
 
-export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction }) => {
-  
-  const isReceita = transaction.categoria === TransactionType.RECEITA;
+export const TransactionItem: React.FC<TransactionItemProps> = ({
+  transaction,
+}) => {
+  const isReceita = transaction.categoria === ETransactionType.RECEITA;
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -35,12 +36,18 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction })
         >
           {isReceita ? "+" : "-"} {formatToBRL(transaction.valor.toString())}
         </p>
-        <p className="text-xs justify-self-end opacity-60">{transaction.data}</p>
+        <p className="text-xs justify-self-end opacity-60">
+          {transaction.data}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Tooltip>
           <TooltipTrigger>
-            <TransactionDialog action="edit" buttonText={<Edit />} />
+            <TransactionDialog
+              action="edit"
+              buttonText={<Edit />}
+              transactionId={transaction.id}
+            />
           </TooltipTrigger>
           <TooltipContent>
             <p>Editar transação</p>
@@ -48,7 +55,11 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction })
         </Tooltip>
         <Tooltip>
           <TooltipTrigger>
-            <TransactionDialog action="delete" buttonText={<Trash2Icon />} />
+            <TransactionDialog
+              action="delete"
+              buttonText={<Trash2Icon />}
+              transactionId={transaction.id}
+            />
           </TooltipTrigger>
           <TooltipContent>
             <p>Excluir transação</p>

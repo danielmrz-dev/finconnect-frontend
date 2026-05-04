@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TransactionType } from "@/types/transaction-type";
+import { useTransactions } from "@/hooks/useTransactions";
 import { formatToBRL } from "@/utils/currency-formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -24,18 +24,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Spinner } from "../ui/spinner";
 import { formSchema } from "./form/new-transaction-form";
+import { ETransactionType } from "@/types/transaction-type";
 
 type TransactionDialogProps = {
   action: "create" | "edit" | "delete";
   buttonText: string | React.ReactNode;
+  transactionId?: number;
 };
 
 export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   action,
   buttonText,
+  transactionId,
 }) => {
+  const { deleteTransaction, isDeleteTransactionPending } = useTransactions();
+
   const [amount, setAmount] = useState<string>("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const isCreationDialog = action === "create";
 
@@ -52,10 +59,18 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
     console.log(data);
   };
 
+  const handleDeleteTransaction = async () => {
+    if (!transactionId) return;
+    await deleteTransaction(transactionId);
+    setIsOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild className="cursor-pointer">
-        <Button variant="outline">{buttonText}</Button>
+        <Button variant="outline" onClick={() => setIsOpen(true)}>
+          {buttonText}
+        </Button>
       </DialogTrigger>
       {action !== "delete" ? (
         <DialogContent className="sm:max-w-sm">
@@ -92,10 +107,10 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                         <SelectValue placeholder="Selecione o tipo de transação" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={TransactionType.RECEITA}>
+                        <SelectItem value={ETransactionType.RECEITA}>
                           Receita
                         </SelectItem>
-                        <SelectItem value={TransactionType.DESPESA}>
+                        <SelectItem value={ETransactionType.DESPESA}>
                           Despesa
                         </SelectItem>
                       </SelectContent>
@@ -170,12 +185,20 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
               </Field>
             </DialogClose>
             {action === "create" && (
-              <Button type="submit" form="form-rhf-demo" className="w-fit cursor-pointer">
+              <Button
+                type="submit"
+                form="form-rhf-demo"
+                className="w-fit cursor-pointer"
+              >
                 Cadastrar
               </Button>
             )}
             {action === "edit" && (
-              <Button type="submit" form="form-rhf-demo" className="w-fit cursor-pointer">
+              <Button
+                type="submit"
+                form="form-rhf-demo"
+                className="w-fit cursor-pointer"
+              >
                 Confirmar edição
               </Button>
             )}
@@ -194,23 +217,30 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
           </DialogHeader>
           <DialogFooter className="flex flex-row">
             <DialogClose asChild>
-              <Field>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => form.reset()}
-                  className="max-w-fit self-end cursor-pointer"
-                >
-                  Cancelar
-                </Button>
-              </Field>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+                className="max-w-fit self-end cursor-pointer"
+              >
+                Cancelar
+              </Button>
             </DialogClose>
+
             <Button
-              type="submit"
-              form="form-rhf-demo"
-              className="w-fit cursor-pointer"
+              type="button"
+              variant="default"
+              onClick={handleDeleteTransaction}
+              disabled={isDeleteTransactionPending}
+              className="max-w-fit self-end cursor-pointer"
             >
-              Excluir
+              {isDeleteTransactionPending ? (
+                <div className="flex items-center gap-1">
+                  Excluindo... <Spinner />
+                </div>
+              ) : (
+                "Excluir"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

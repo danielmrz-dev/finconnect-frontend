@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/empty-state";
 import { Loader } from "@/components/loader";
 import { TransactionDialog } from "@/components/transaction-dialog";
 import {
@@ -10,10 +11,12 @@ import {
 } from "@/components/ui/select";
 import { useTransactions } from "@/hooks/useTransactions";
 import { TransactionItem } from "../../components/transactions/components";
-import { EmptyState } from "@/components/empty-state";
+import { useTransactionsContext } from "@/contexts/transactions-context";
 
 export const TransactionsPage: React.FC = () => {
-  const { transactions, isTransactionsLoading } = useTransactions();
+
+  const { transactions } = useTransactionsContext();
+  const { isTransactionsLoading } = useTransactions();
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -34,8 +37,11 @@ export const TransactionsPage: React.FC = () => {
           </Select>
         </div>
         <div className="flex flex-col gap-4">
-          {isTransactionsLoading && <Loader />}
-          {transactions && transactions.length > 1 &&
+          {isTransactionsLoading ? (
+            <Loader />
+          ) : (
+            transactions &&
+            transactions.length > 1 &&
             transactions.map((transaction) => {
               return (
                 <TransactionItem
@@ -43,12 +49,9 @@ export const TransactionsPage: React.FC = () => {
                   transaction={transaction}
                 />
               );
-            })}
-          {
-            transactions && transactions.length <= 0
-            && 
-            <EmptyState/>
-          }
+            })
+          )}
+          {transactions && transactions.length <= 0 && <EmptyState />}
         </div>
         <div className="self-end">
           <TransactionDialog

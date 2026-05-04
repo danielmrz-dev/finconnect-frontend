@@ -10,24 +10,27 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { TransactionsContextProvider } from "./contexts/transactions-provider";
 
 
 const root = document.getElementById("root");
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(root!).render(
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <Routes>
-          <Route path={Paths.Home} element={<App />}>
-            <Route index element={<HomePage />} />
-          </Route>
+    <TransactionsContextProvider>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Routes>
+            <Route path={Paths.Home} element={<App />}>
+              <Route index element={<HomePage />} />
+            </Route>
 
-          <Route path={Paths.Transactions} element={<TransactionsPage />} />
-        </Routes>
-      </TooltipProvider>
-    </BrowserRouter>,
+            <Route path={Paths.Transactions} element={<TransactionsPage />} />
+          </Routes>
+        </TooltipProvider>
+      </BrowserRouter>
+    </TransactionsContextProvider>
   </QueryClientProvider>
 );
