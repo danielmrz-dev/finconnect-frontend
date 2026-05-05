@@ -25,7 +25,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
     >
       <p className={`text-xs opacity-80 ${styles.cardTextColor}`}>{title}</p>
       <p className={`text-3xl font-extrabold ${styles.cardTextColor}`}>
-        {formatToBRL(amount)}
+        {formatToBRL(Number(amount))}
       </p>
     </div>
   );

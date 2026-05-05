@@ -1,11 +1,31 @@
 export const parseIsoDate = (value: string) => {
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) {
+  if (!value) {
     return undefined;
   }
 
-  const parsed = new Date(year, month - 1, day);
+  const dateOnlyRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+  const dateOnlyMatch = value.match(dateOnlyRegex);
+
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+
+  const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+};
+
+export const formatIsoDate = (date: Date | undefined) => {
+  if (!date) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 };
 
 export const isNotFutureDate = (value: string) => {

@@ -1,5 +1,9 @@
 import { TransactionDialog } from "@/components/transaction-dialog";
 import {
+  formatDate,
+  parseIsoDate,
+} from "@/components/transaction-dialog/utils";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -10,7 +14,6 @@ import { Edit, Trash2Icon } from "lucide-react";
 import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
 import profilePicture from "../../../assets/profile-picture.png";
 import { formatToBRL } from "../../../utils/currency-formatter";
-import { formatDate } from "@/components/transaction-dialog/utils";
 
 type TransactionItemProps = {
   transaction: ITransaction;
@@ -35,10 +38,10 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         <p
           className={`text-xs font-extrabold justify-self-end ${isReceita ? "text-green-500" : "text-red-400"}`}
         >
-          {isReceita ? "+" : "-"} {formatToBRL(transaction.valor.toString())}
+          {isReceita ? "+" : "-"} {formatToBRL(transaction.valor)}
         </p>
         <p className="text-xs justify-self-end opacity-60">
-          {formatDate(new Date(transaction.data))}
+          {formatDate(parseIsoDate(transaction.data))}
         </p>
       </div>
       <div className="flex items-center gap-2">

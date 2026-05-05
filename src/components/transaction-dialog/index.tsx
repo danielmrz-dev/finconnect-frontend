@@ -296,7 +296,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 control={form.control}
                 render={({ field, fieldState }) => {
                   const displayValue = field.value
-                    ? formatToBRL(field.value.toString())
+                    ? formatToBRL(field.value)
                     : "";
 
                   return (
@@ -311,9 +311,8 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                         autoComplete="off"
                         value={displayValue}
                         onChange={({ currentTarget }) => {
-                          const numeric =
-                            Number(currentTarget.value.replace(/\D/g, "")) /
-                            100;
+                          const digits = currentTarget.value.replace(/\D/g, "");
+                          const numeric = digits ? Number(digits) / 100 : 0;
                           field.onChange(numeric);
                         }}
                       />
