@@ -1,5 +1,6 @@
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { TransactionsService } from "@/services/transactions-service";
+import type { ICreateTransactionPayload } from "@/types/create-transaction-payload";
 import type { IUpdateTransactionPayload } from "@/types/update-transaction-payload";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -15,11 +16,14 @@ export const useTransactions = () => {
     return data;
   };
 
-  const { isLoading: isTransactionsLoading, isError: isTransactionsError } =
-    useQuery({
-      queryKey: ["transacoes", changeTrigger],
-      queryFn: fetchTransactions,
-    });
+  const {
+    data: transactionsList,
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+  } = useQuery({
+    queryKey: ["transacoes", changeTrigger],
+    queryFn: fetchTransactions,
+  });
 
   const {
     mutateAsync: deleteTransaction,
@@ -36,9 +40,9 @@ export const useTransactions = () => {
   });
 
   type UpdateMutate = {
-    id: number,
-    payload: IUpdateTransactionPayload
-  }
+    id: number;
+    payload: IUpdateTransactionPayload;
+  };
 
   const {
     mutateAsync: updateTransaction,
@@ -55,7 +59,23 @@ export const useTransactions = () => {
     onError: () => {},
   });
 
+  const {
+    mutateAsync: createTransaction,
+    isPending: isCreateTransactionPending,
+    isError: isCreateTransactionError,
+  } = useMutation({
+    mutationFn: async (payload: ICreateTransactionPayload) => {
+      const { data } = await TransactionsService.createTransaction(payload);
+      return data;
+    },
+    onSuccess: () => {
+      setChangeTrigger((prev) => prev + 1);
+    },
+    onError: () => {},
+  });
+
   return {
+    transactionsList,
     isTransactionsLoading,
     isTransactionsError,
     deleteTransaction,
@@ -64,5 +84,8 @@ export const useTransactions = () => {
     updateTransaction,
     isUpdateTransactionPending,
     isUpdateTransactionError,
+    createTransaction,
+    isCreateTransactionPending,
+    isCreateTransactionError,
   };
 };

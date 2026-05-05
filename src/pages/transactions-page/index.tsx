@@ -11,26 +11,47 @@ import {
 } from "@/components/ui/select";
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
+import { ETransactionType } from "@/types/transaction-type";
+import { useMemo, useState } from "react";
 import { TransactionItem } from "../../components/transactions/components";
 
 export const TransactionsPage: React.FC = () => {
   const { transactions } = useTransactionsContext();
   const { isTransactionsLoading } = useTransactions();
+  const [category, setCategory] = useState<ETransactionType | string>("Todas");
+
+  const filteredTransactions = useMemo(() => {
+    if (category === ETransactionType.RECEITA) {
+      return transactions.filter(
+        (t) => t.categoria === ETransactionType.RECEITA,
+      );
+    } else if (category === ETransactionType.DESPESA) {
+      return transactions.filter(
+        (t) => t.categoria === ETransactionType.DESPESA,
+      );
+    } else {
+      return transactions;
+    }
+  }, [transactions, category]);
 
   return (
     <div className="p-4 flex flex-col gap-4">
       <h1 className="font-bold text-3xl">Transações</h1>
       <div className="flex flex-col gap-6 bg-white p-6 rounded-lg shadow">
         <div className="flex flex-wrap items-center justify-between">
-          <Select onValueChange={() => {}}>
+          <Select onValueChange={(v) => setCategory(v)}>
             <SelectTrigger className="w-45 self-end">
               <SelectValue placeholder="Filtrar por categoria" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="Todas">Todas</SelectItem>
-                <SelectItem value="Receitas">Receitas</SelectItem>
-                <SelectItem value="Despesas">Despesas</SelectItem>
+                <SelectItem value={ETransactionType.RECEITA}>
+                  Receitas
+                </SelectItem>
+                <SelectItem value={ETransactionType.DESPESA}>
+                  Despesas
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -39,9 +60,9 @@ export const TransactionsPage: React.FC = () => {
           {isTransactionsLoading ? (
             <Loader />
           ) : (
-            transactions &&
-            transactions.length > 1 &&
-            transactions.map((transaction) => {
+            filteredTransactions &&
+            filteredTransactions.length > 1 &&
+            filteredTransactions.map((transaction) => {
               return (
                 <TransactionItem
                   key={transaction.id}
@@ -51,8 +72,8 @@ export const TransactionsPage: React.FC = () => {
             })
           )}
           {!isTransactionsLoading &&
-            transactions &&
-            transactions.length <= 0 && <EmptyState />}
+            filteredTransactions &&
+            filteredTransactions.length <= 0 && <EmptyState />}
         </div>
         <div className="self-end">
           <TransactionDialog

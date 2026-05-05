@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
+import { useUsers } from "@/hooks/useUsers";
+import type { ICreateTransactionPayload } from "@/types/create-transaction-payload";
 import { ETransactionType } from "@/types/transaction-type";
 import type { IUpdateTransactionPayload } from "@/types/update-transaction-payload";
 import { formatToBRL } from "@/utils/currency-formatter";
@@ -52,11 +54,15 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   transactionId,
 }) => {
   const { transactions } = useTransactionsContext();
+  const { user } = useUsers(21);
+
   const {
     deleteTransaction,
     isDeleteTransactionPending,
     updateTransaction,
     isUpdateTransactionPending,
+    createTransaction,
+    isCreateTransactionPending,
   } = useTransactions();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -78,6 +84,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
       valor: isCreationDialog ? 0 : transactionToEdit?.valor,
       data: isCreationDialog ? "" : (transactionToEdit?.data ?? ""),
     },
+    mode: "onChange"
   });
 
   const { isDirty, isValid } = form.formState;
@@ -103,13 +110,29 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
     }
   }, [isCreationDialog, transactionToEdit, form]);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = () => {
     if (action === "create") {
-      console.log(data);
+      handleCreateTransaction();
     }
     if (action === "edit") {
       handleUpdateTransaction();
     }
+  };
+
+  const handleCreateTransaction = async () => {
+    if (!user) throw new Error("User not found");
+
+    const formData = form.getValues();
+    const payload = {
+      categoria: formData.tipo,
+      descricao: formData.descricao,
+      valor: formData.valor,
+      data: formData.data,
+      usuarioId: user.id,
+    } satisfies ICreateTransactionPayload;
+
+    await createTransaction(payload);
+    setIsOpen(false);
   };
 
   const handleUpdateTransaction = async () => {
@@ -128,6 +151,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
       payload,
     });
     setIsOpen(false);
+    form.reset();
   };
 
   const handleDeleteTransaction = async () => {
@@ -218,7 +242,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 control={form.control}
                 render={({ field, fieldState }) => {
                   const fieldDate = field.value
-                    ? new Date(field.value)
+                    ? new Date(field.value + "T00:00:00")
                     : undefined;
                   const selectedDate = isValidDate(fieldDate)
                     ? fieldDate
@@ -346,7 +370,14 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 className="w-fit cursor-pointer"
                 disabled={!isDirty || !isValid}
               >
-                Cadastrar
+                {isCreateTransactionPending ? (
+                  <div className="flex items-center gap-1">
+                    Cadastrando... <Spinner />
+                  </div>
+                ) : (
+                  "Cadastrar"
+                )}
+                
               </Button>
             )}
             {action === "edit" && (
@@ -354,7 +385,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 type="submit"
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
-                disabled={!isDirty}
+                disabled={!isDirty || !isValid}
                 onClick={handleUpdateTransaction}
               >
                 {isUpdateTransactionPending ? (

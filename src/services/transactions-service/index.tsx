@@ -11,6 +11,17 @@ export const TransactionsService = {
     return { data };
   },
 
+  createTransaction: async (
+    payload: IUpdateTransactionPayload,
+  ) => {
+    const { data } = await axios.post(
+      `${endpoints.BASE_URL}/api/transacoes`,
+      payload,
+    );
+
+    return { data };
+  },
+
   deleteTransaction: async (id: number) => {
     const { data } = await axios.delete(
       `${endpoints.BASE_URL}/api/transacoes/${id}`,
@@ -29,4 +40,6 @@ export const TransactionsService = {
 
     return { data };
   },
+
+  
 };

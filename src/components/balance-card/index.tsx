@@ -16,15 +16,16 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
     return {
       bgColor: cardBgColor === "light" ? "bg-white" : "bg-black",
       cardTextColor: cardBgColor === "light" ? "text-black" : "text-white",
+      amountColor: Number(amount) < 0 || title === "Despesas" ? "text-red-500" : "text-green-500",
     };
-  }, [cardBgColor]);
+  }, [cardBgColor, amount]);
 
   return (
     <div
       className={`flex flex-col gap-1 p-6 rounded-lg shadow ${styles.bgColor}`}
     >
       <p className={`text-xs opacity-80 ${styles.cardTextColor}`}>{title}</p>
-      <p className={`text-3xl font-extrabold ${styles.cardTextColor}`}>
+      <p className={`text-3xl font-extrabold ${styles.amountColor}`}>
         {formatToBRL(Number(amount))}
       </p>
     </div>
