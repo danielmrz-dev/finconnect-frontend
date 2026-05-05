@@ -9,10 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
+import { ETransactionType } from "@/types/transaction-type";
 import { formatToBRL } from "@/utils/currency-formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
@@ -26,7 +28,6 @@ import {
 } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 import { formSchema } from "./form/new-transaction-form";
-import { ETransactionType } from "@/types/transaction-type";
 
 type TransactionDialogProps = {
   action: "create" | "edit" | "delete";
@@ -39,21 +40,46 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   buttonText,
   transactionId,
 }) => {
+  const { transactions } = useTransactionsContext();
   const { deleteTransaction, isDeleteTransactionPending } = useTransactions();
 
-  const [amount, setAmount] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const isCreationDialog = action === "create";
 
+  const transactionToEdit = useMemo(() => {
+    return transactions.find((transaction) => transaction.id === transactionId);
+  }, [transactionId, transactions]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      tipo: isCreationDialog ? "Receita" : "Despesa",
-      descricao: isCreationDialog ? "" : "Transação editada",
-      valor: isCreationDialog ? 0 : 0,
+      tipo: isCreationDialog ? "Receita" : transactionToEdit?.categoria,
+      descricao: isCreationDialog ? "" : transactionToEdit?.descricao,
+      valor: isCreationDialog ? 0 : transactionToEdit?.valor,
     },
   });
+
+  const { isDirty } = form.formState;
+
+  useEffect(() => {
+    if (isCreationDialog) {
+      form.reset({
+        tipo: "Receita",
+        descricao: "",
+        valor: 0,
+      });
+      return;
+    }
+
+    if (transactionToEdit) {
+      form.reset({
+        tipo: transactionToEdit.categoria,
+        descricao: transactionToEdit.descricao,
+        valor: transactionToEdit.valor,
+      });
+    }
+  }, [isCreationDialog, transactionToEdit, form]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     console.log(data);
@@ -145,28 +171,35 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
               <Controller
                 name="valor"
                 control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-demo-title">Valor</FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-rhf-demo-title"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="off"
-                      value={amount}
-                      onChange={({ currentTarget }) => {
-                        const formatted = formatToBRL(currentTarget.value);
-                        const numeric =
-                          Number(currentTarget.value.replace(/\D/g, "")) / 100;
-                        setAmount(formatted);
-                        field.onChange(numeric);
-                      }}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
+                render={({ field, fieldState }) => {
+                  const displayValue = field.value
+                    ? formatToBRL(field.value.toString())
+                    : "";
+
+                  return (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-demo-title">
+                        Valor
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="form-rhf-demo-title"
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="off"
+                        value={displayValue}
+                        onChange={({ currentTarget }) => {
+                          const numeric =
+                            Number(currentTarget.value.replace(/\D/g, "")) /
+                            100;
+                          field.onChange(numeric);
+                        }}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
               />
             </FieldGroup>
           </form>
@@ -198,6 +231,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 type="submit"
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
+                disabled={!isDirty}
               >
                 Confirmar edição
               </Button>

@@ -24,7 +24,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
     <div className="flex items-center justify-between gap-2">
       <img src={profilePicture} alt="" />
       <div className="mr-auto">
-        <p className="text-xs font-bold">{transaction.usuarioId}</p>
+        <p className="text-xs font-bold">{transaction.descricao}</p>
         <p className="text-xs flex items-center gap-1 opacity-60">
           {isReceita ? <GoArrowDownLeft /> : <GoArrowUpRight />}
           {isReceita ? "Recebido" : "Enviado"}
