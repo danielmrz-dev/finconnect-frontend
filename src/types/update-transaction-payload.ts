@@ -1,9 +1,8 @@
 import type { ETransactionType } from "./transaction-type";
 
-export interface ICreateTransactionPayload {
+export interface IUpdateTransactionPayload {
   categoria: ETransactionType;
-  data: string;
   descricao: string;
-  usuarioId: number;
   valor: number;
+  data: string
 }

@@ -10,6 +10,7 @@ import { Edit, Trash2Icon } from "lucide-react";
 import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
 import profilePicture from "../../../assets/profile-picture.png";
 import { formatToBRL } from "../../../utils/currency-formatter";
+import { formatDate } from "@/components/transaction-dialog/utils";
 
 type TransactionItemProps = {
   transaction: ITransaction;
@@ -37,7 +38,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           {isReceita ? "+" : "-"} {formatToBRL(transaction.valor.toString())}
         </p>
         <p className="text-xs justify-self-end opacity-60">
-          {transaction.data}
+          {formatDate(new Date(transaction.data))}
         </p>
       </div>
       <div className="flex items-center gap-2">

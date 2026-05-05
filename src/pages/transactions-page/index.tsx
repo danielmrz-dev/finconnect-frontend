@@ -9,12 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
 import { TransactionItem } from "../../components/transactions/components";
-import { useTransactionsContext } from "@/contexts/transactions-context";
 
 export const TransactionsPage: React.FC = () => {
-
   const { transactions } = useTransactionsContext();
   const { isTransactionsLoading } = useTransactions();
 
@@ -51,7 +50,9 @@ export const TransactionsPage: React.FC = () => {
               );
             })
           )}
-          {transactions && transactions.length <= 0 && <EmptyState />}
+          {!isTransactionsLoading &&
+            transactions &&
+            transactions.length <= 0 && <EmptyState />}
         </div>
         <div className="self-end">
           <TransactionDialog

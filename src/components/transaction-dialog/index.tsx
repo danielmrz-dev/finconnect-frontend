@@ -12,13 +12,23 @@ import {
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
 import { ETransactionType } from "@/types/transaction-type";
+import type { IUpdateTransactionPayload } from "@/types/update-transaction-payload";
 import { formatToBRL } from "@/utils/currency-formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import { Calendar } from "../ui/calendar";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "../ui/input-group";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -28,6 +38,7 @@ import {
 } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 import { formSchema } from "./form/new-transaction-form";
+import { formatDate, isValidDate } from "./utils";
 
 type TransactionDialogProps = {
   action: "create" | "edit" | "delete";
@@ -41,9 +52,15 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   transactionId,
 }) => {
   const { transactions } = useTransactionsContext();
-  const { deleteTransaction, isDeleteTransactionPending } = useTransactions();
+  const {
+    deleteTransaction,
+    isDeleteTransactionPending,
+    updateTransaction,
+    isUpdateTransactionPending,
+  } = useTransactions();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
 
   const isCreationDialog = action === "create";
 
@@ -54,20 +71,24 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      tipo: isCreationDialog ? "Receita" : transactionToEdit?.categoria,
+      tipo: isCreationDialog
+        ? ETransactionType.RECEITA
+        : transactionToEdit?.categoria,
       descricao: isCreationDialog ? "" : transactionToEdit?.descricao,
       valor: isCreationDialog ? 0 : transactionToEdit?.valor,
+      data: isCreationDialog ? "" : (transactionToEdit?.data ?? ""),
     },
   });
 
-  const { isDirty } = form.formState;
+  const { isDirty, isValid } = form.formState;
 
   useEffect(() => {
     if (isCreationDialog) {
       form.reset({
-        tipo: "Receita",
+        tipo: ETransactionType.RECEITA,
         descricao: "",
         valor: 0,
+        data: "",
       });
       return;
     }
@@ -77,12 +98,36 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
         tipo: transactionToEdit.categoria,
         descricao: transactionToEdit.descricao,
         valor: transactionToEdit.valor,
+        data: transactionToEdit.data ?? "",
       });
     }
   }, [isCreationDialog, transactionToEdit, form]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+    if (action === "create") {
+      console.log(data);
+    }
+    if (action === "edit") {
+      handleUpdateTransaction();
+    }
+  };
+
+  const handleUpdateTransaction = async () => {
+    if (!transactionId) throw new Error("Transaction ID not provided.");
+
+    const formData = form.getValues();
+    const payload = {
+      categoria: formData.tipo,
+      descricao: formData.descricao,
+      valor: formData.valor,
+      data: formData.data,
+    } satisfies IUpdateTransactionPayload;
+
+    await updateTransaction({
+      id: transactionId,
+      payload,
+    });
+    setIsOpen(false);
   };
 
   const handleDeleteTransaction = async () => {
@@ -169,6 +214,84 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 )}
               />
               <Controller
+                name="data"
+                control={form.control}
+                render={({ field, fieldState }) => {
+                  const fieldDate = field.value
+                    ? new Date(field.value)
+                    : undefined;
+                  const selectedDate = isValidDate(fieldDate)
+                    ? fieldDate
+                    : undefined;
+
+                  return (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="date-required">Data</FieldLabel>
+                      <InputGroup>
+                        <InputGroupInput
+                          {...field}
+                          id="date-required"
+                          value={
+                            selectedDate
+                              ? formatDate(selectedDate)
+                              : (field.value ?? "")
+                          }
+                          placeholder="Escolha uma data"
+                          onChange={(e) => {
+                            const rawValue = e.target.value;
+                            field.onChange(rawValue);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowDown") {
+                              e.preventDefault();
+                              setOpen(true);
+                            }
+                          }}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                              <InputGroupButton
+                                id="date-picker"
+                                variant="ghost"
+                                size="icon-xs"
+                                aria-label="Select date"
+                              >
+                                <CalendarIcon />
+                                <span className="sr-only">Select date</span>
+                              </InputGroupButton>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto overflow-hidden p-0"
+                              align="end"
+                              alignOffset={-8}
+                              sideOffset={10}
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={(selectedDate) => {
+                                  if (!selectedDate) {
+                                    return;
+                                  }
+                                  field.onChange(
+                                    selectedDate.toISOString().split("T")[0],
+                                  );
+                                  setOpen(false);
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </InputGroupAddon>
+                      </InputGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+              <Controller
                 name="valor"
                 control={form.control}
                 render={({ field, fieldState }) => {
@@ -222,6 +345,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 type="submit"
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
+                disabled={!isDirty || !isValid}
               >
                 Cadastrar
               </Button>
@@ -232,8 +356,15 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
                 disabled={!isDirty}
+                onClick={handleUpdateTransaction}
               >
-                Confirmar edição
+                {isUpdateTransactionPending ? (
+                  <div className="flex items-center gap-1">
+                    Editando... <Spinner />
+                  </div>
+                ) : (
+                  "Confirmar edição"
+                )}
               </Button>
             )}
           </DialogFooter>

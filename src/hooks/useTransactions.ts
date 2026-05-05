@@ -1,13 +1,13 @@
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { TransactionsService } from "@/services/transactions-service";
+import type { IUpdateTransactionPayload } from "@/types/update-transaction-payload";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export const useTransactions = () => {
-
   const { setTransactions } = useTransactionsContext();
 
-  const [deletionTrigger, setDeletionTrigger] = useState<number>(0);
+  const [changeTrigger, setChangeTrigger] = useState<number>(0);
 
   const fetchTransactions = async () => {
     const { data } = await TransactionsService.getTransactions();
@@ -15,24 +15,42 @@ export const useTransactions = () => {
     return data;
   };
 
-  const {
-    isLoading: isTransactionsLoading,
-    isError: isTransactionsError,
-  } = useQuery({
-    queryKey: ["transacoes", deletionTrigger],
-    queryFn: fetchTransactions,
-  });
+  const { isLoading: isTransactionsLoading, isError: isTransactionsError } =
+    useQuery({
+      queryKey: ["transacoes", changeTrigger],
+      queryFn: fetchTransactions,
+    });
 
-  const { 
+  const {
     mutateAsync: deleteTransaction,
     isPending: isDeleteTransactionPending,
-    isError: isDeleteTransactionError
+    isError: isDeleteTransactionError,
   } = useMutation({
     mutationFn: async (id: number) => {
       await TransactionsService.deleteTransaction(id);
     },
     onSuccess: () => {
-      setDeletionTrigger(prev => prev + 1);
+      setChangeTrigger((prev) => prev + 1);
+    },
+    onError: () => {},
+  });
+
+  type UpdateMutate = {
+    id: number,
+    payload: IUpdateTransactionPayload
+  }
+
+  const {
+    mutateAsync: updateTransaction,
+    isPending: isUpdateTransactionPending,
+    isError: isUpdateTransactionError,
+  } = useMutation({
+    mutationFn: async ({ id, payload }: UpdateMutate) => {
+      const { data } = await TransactionsService.updateTransaction(id, payload);
+      return data;
+    },
+    onSuccess: () => {
+      setChangeTrigger((prev) => prev + 1);
     },
     onError: () => {},
   });
@@ -42,6 +60,9 @@ export const useTransactions = () => {
     isTransactionsError,
     deleteTransaction,
     isDeleteTransactionPending,
-    isDeleteTransactionError
+    isDeleteTransactionError,
+    updateTransaction,
+    isUpdateTransactionPending,
+    isUpdateTransactionError,
   };
 };
