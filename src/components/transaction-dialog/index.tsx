@@ -84,7 +84,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
       valor: isCreationDialog ? 0 : transactionToEdit?.valor,
       data: isCreationDialog ? "" : (transactionToEdit?.data ?? ""),
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const { isDirty, isValid } = form.formState;
@@ -133,6 +133,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
 
     await createTransaction(payload);
     setIsOpen(false);
+    form.reset();
   };
 
   const handleUpdateTransaction = async () => {
@@ -237,116 +238,121 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                   </Field>
                 )}
               />
-              <Controller
-                name="data"
-                control={form.control}
-                render={({ field, fieldState }) => {
-                  const fieldDate = field.value
-                    ? new Date(field.value + "T00:00:00")
-                    : undefined;
-                  const selectedDate = isValidDate(fieldDate)
-                    ? fieldDate
-                    : undefined;
+              <div className="flex items-start gap-3">
+                <Controller
+                  name="data"
+                  control={form.control}
+                  render={({ field, fieldState }) => {
+                    const fieldDate = field.value
+                      ? new Date(field.value + "T00:00:00")
+                      : undefined;
+                    const selectedDate = isValidDate(fieldDate)
+                      ? fieldDate
+                      : undefined;
 
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="date-required">Data</FieldLabel>
-                      <InputGroup>
-                        <InputGroupInput
-                          {...field}
-                          id="date-required"
-                          value={
-                            selectedDate
-                              ? formatDate(selectedDate)
-                              : (field.value ?? "")
-                          }
-                          placeholder="Escolha uma data"
-                          onChange={(e) => {
-                            const rawValue = e.target.value;
-                            field.onChange(rawValue);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "ArrowDown") {
-                              e.preventDefault();
-                              setOpen(true);
+                    return (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="date-required">Data</FieldLabel>
+                        <InputGroup>
+                          <InputGroupInput
+                            {...field}
+                            id="date-required"
+                            value={
+                              selectedDate
+                                ? formatDate(selectedDate)
+                                : (field.value ?? "")
                             }
+                            placeholder="Escolha uma data"
+                            onChange={(e) => {
+                              const rawValue = e.target.value;
+                              field.onChange(rawValue);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "ArrowDown") {
+                                e.preventDefault();
+                                setOpen(true);
+                              }
+                            }}
+                          />
+                          <InputGroupAddon align="inline-end">
+                            <Popover open={open} onOpenChange={setOpen}>
+                              <PopoverTrigger asChild>
+                                <InputGroupButton
+                                  id="date-picker"
+                                  variant="ghost"
+                                  size="icon-xs"
+                                  aria-label="Select date"
+                                >
+                                  <CalendarIcon />
+                                  <span className="sr-only">Select date</span>
+                                </InputGroupButton>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto overflow-hidden p-0"
+                                align="end"
+                                alignOffset={-8}
+                                sideOffset={10}
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={selectedDate}
+                                  onSelect={(selectedDate) => {
+                                    if (!selectedDate) {
+                                      return;
+                                    }
+                                    field.onChange(
+                                      selectedDate.toISOString().split("T")[0],
+                                    );
+                                    setOpen(false);
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </InputGroupAddon>
+                        </InputGroup>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+                <Controller
+                  name="valor"
+                  control={form.control}
+                  render={({ field, fieldState }) => {
+                    const displayValue = field.value
+                      ? formatToBRL(field.value)
+                      : "";
+
+                    return (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rhf-demo-title">
+                          Valor
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          id="form-rhf-demo-title"
+                          aria-invalid={fieldState.invalid}
+                          autoComplete="off"
+                          value={displayValue}
+                          onChange={({ currentTarget }) => {
+                            const digits = currentTarget.value.replace(
+                              /\D/g,
+                              "",
+                            );
+                            const numeric = digits ? Number(digits) / 100 : 0;
+                            field.onChange(numeric);
                           }}
                         />
-                        <InputGroupAddon align="inline-end">
-                          <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                              <InputGroupButton
-                                id="date-picker"
-                                variant="ghost"
-                                size="icon-xs"
-                                aria-label="Select date"
-                              >
-                                <CalendarIcon />
-                                <span className="sr-only">Select date</span>
-                              </InputGroupButton>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto overflow-hidden p-0"
-                              align="end"
-                              alignOffset={-8}
-                              sideOffset={10}
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={selectedDate}
-                                onSelect={(selectedDate) => {
-                                  if (!selectedDate) {
-                                    return;
-                                  }
-                                  field.onChange(
-                                    selectedDate.toISOString().split("T")[0],
-                                  );
-                                  setOpen(false);
-                                }}
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </InputGroupAddon>
-                      </InputGroup>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  );
-                }}
-              />
-              <Controller
-                name="valor"
-                control={form.control}
-                render={({ field, fieldState }) => {
-                  const displayValue = field.value
-                    ? formatToBRL(field.value)
-                    : "";
-
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="form-rhf-demo-title">
-                        Valor
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id="form-rhf-demo-title"
-                        aria-invalid={fieldState.invalid}
-                        autoComplete="off"
-                        value={displayValue}
-                        onChange={({ currentTarget }) => {
-                          const digits = currentTarget.value.replace(/\D/g, "");
-                          const numeric = digits ? Number(digits) / 100 : 0;
-                          field.onChange(numeric);
-                        }}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  );
-                }}
-              />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+              </div>
             </FieldGroup>
           </form>
 
@@ -368,7 +374,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 type="submit"
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
-                disabled={!isDirty || !isValid}
+                disabled={!isDirty || !isValid || isCreateTransactionPending}
               >
                 {isCreateTransactionPending ? (
                   <div className="flex items-center gap-1">
@@ -377,7 +383,6 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 ) : (
                   "Cadastrar"
                 )}
-                
               </Button>
             )}
             {action === "edit" && (
@@ -385,7 +390,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 type="submit"
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
-                disabled={!isDirty || !isValid}
+                disabled={!isDirty || !isValid || isUpdateTransactionPending}
                 onClick={handleUpdateTransaction}
               >
                 {isUpdateTransactionPending ? (
@@ -410,7 +415,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
               dos nossos servidores permanentemente.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex flex-row">
+          <DialogFooter className="flex flex-row justify-end">
             <DialogClose asChild>
               <Button
                 type="button"

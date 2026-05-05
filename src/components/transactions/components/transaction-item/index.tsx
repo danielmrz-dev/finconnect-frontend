@@ -12,15 +12,17 @@ import type { ITransaction } from "@/types/transaction";
 import { ETransactionType } from "@/types/transaction-type";
 import { Edit, Trash2Icon } from "lucide-react";
 import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
-import profilePicture from "../../../assets/profile-picture.png";
-import { formatToBRL } from "../../../utils/currency-formatter";
+import profilePicture from "../../../../assets/profile-picture.png";
+import { formatToBRL } from "../../../../utils/currency-formatter";
 
 type TransactionItemProps = {
   transaction: ITransaction;
+  page: "Home" | "Transacoes";
 };
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction,
+  page,
 }) => {
   const isReceita = transaction.categoria === ETransactionType.RECEITA;
 
@@ -44,32 +46,34 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           {formatDate(parseIsoDate(transaction.data))}
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger>
-            <TransactionDialog
-              action="edit"
-              buttonText={<Edit />}
-              transactionId={transaction.id}
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Editar transação</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger>
-            <TransactionDialog
-              action="delete"
-              buttonText={<Trash2Icon />}
-              transactionId={transaction.id}
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Excluir transação</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+      {page === "Transacoes" && (
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger>
+              <TransactionDialog
+                action="edit"
+                buttonText={<Edit />}
+                transactionId={transaction.id}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Editar transação</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <TransactionDialog
+                action="delete"
+                buttonText={<Trash2Icon />}
+                transactionId={transaction.id}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Excluir transação</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 };

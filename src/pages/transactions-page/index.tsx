@@ -13,7 +13,7 @@ import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useTransactions } from "@/hooks/useTransactions";
 import { ETransactionType } from "@/types/transaction-type";
 import { useMemo, useState } from "react";
-import { TransactionItem } from "../../components/transactions/components";
+import { TransactionItem } from "../../components/transactions/components/transaction-item";
 
 export const TransactionsPage: React.FC = () => {
   const { transactions } = useTransactionsContext();
@@ -61,12 +61,13 @@ export const TransactionsPage: React.FC = () => {
             <Loader />
           ) : (
             filteredTransactions &&
-            filteredTransactions.length > 1 &&
+            filteredTransactions.length > 0 &&
             filteredTransactions.map((transaction) => {
               return (
                 <TransactionItem
                   key={transaction.id}
                   transaction={transaction}
+                  page="Transacoes"
                 />
               );
             })

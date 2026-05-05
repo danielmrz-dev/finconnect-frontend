@@ -37,16 +37,19 @@ export const HomePage = () => {
           amount={balance.saldo.toString()}
           title="Saldo atual"
           cardBgColor="dark"
+          isLoading={isTransactionsLoading}
         />
         <BalanceCard
           amount={balance.receitas.toString()}
           title="Receitas"
           cardBgColor="light"
+          isLoading={isTransactionsLoading}
         />
         <BalanceCard
           amount={balance.despesas.toString()}
           title="Despesas"
           cardBgColor="light"
+          isLoading={isTransactionsLoading}
         />
       </div>
       <Transactions transactions={transactions} isLoading={isTransactionsLoading}/>
