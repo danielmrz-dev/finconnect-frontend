@@ -23,7 +23,7 @@ export const formatDate = (date: Date | undefined) => {
   }
   return date.toLocaleDateString("pt-BR", {
     day: "2-digit",
-    month: "long",
+    month: "2-digit",
     year: "numeric",
   });
 };

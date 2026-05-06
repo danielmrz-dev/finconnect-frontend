@@ -6,12 +6,8 @@ import { HomePage } from "./pages/home-page";
 import { TransactionsPage } from "./pages/transactions-page";
 import { Paths } from "./routes";
 
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TransactionsContextProvider } from "./contexts/transactions-provider";
-
 
 const root = document.getElementById("root");
 
@@ -26,11 +22,10 @@ ReactDOM.createRoot(root!).render(
             <Route path={Paths.Home} element={<App />}>
               <Route index element={<HomePage />} />
             </Route>
-
             <Route path={Paths.Transactions} element={<TransactionsPage />} />
           </Routes>
         </TooltipProvider>
       </BrowserRouter>
     </TransactionsContextProvider>
-  </QueryClientProvider>
+  </QueryClientProvider>,
 );

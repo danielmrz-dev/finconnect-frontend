@@ -164,7 +164,10 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild className="cursor-pointer">
-        <Button variant="outline" onClick={() => setIsOpen(true)}>
+        <Button 
+          className={action === "create" ? "" : "w-8 h-8"}
+          variant={action === "delete" ? "destructive" : "outline"} 
+          onClick={() => setIsOpen(true)}>
           {buttonText}
         </Button>
       </DialogTrigger>

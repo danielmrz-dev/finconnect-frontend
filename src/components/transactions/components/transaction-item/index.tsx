@@ -12,7 +12,6 @@ import type { ITransaction } from "@/types/transaction";
 import { ETransactionType } from "@/types/transaction-type";
 import { Edit, Trash2Icon } from "lucide-react";
 import { GoArrowDownLeft, GoArrowUpRight } from "react-icons/go";
-import profilePicture from "../../../../assets/profile-picture.png";
 import { formatToBRL } from "../../../../utils/currency-formatter";
 
 type TransactionItemProps = {
@@ -28,7 +27,6 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
 
   return (
     <div className="flex items-center justify-between gap-2">
-      <img src={profilePicture} alt="" />
       <div className="mr-auto">
         <p className="text-xs font-bold">{transaction.descricao}</p>
         <p className="text-xs flex items-center gap-1 opacity-60">
@@ -47,7 +45,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         </p>
       </div>
       {page === "Transacoes" && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger>
               <TransactionDialog
