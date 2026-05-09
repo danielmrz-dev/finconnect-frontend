@@ -165,8 +165,8 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild className="cursor-pointer">
         <Button 
-          className={action === "create" ? "" : "w-8 h-8"}
-          variant={action === "delete" ? "destructive" : "outline"} 
+          className={action === "create" ? "" : "w-7 h-7"}
+          variant={action === "delete" ? "destructive" : "secondary"} 
           onClick={() => setIsOpen(true)}>
           {buttonText}
         </Button>
@@ -266,6 +266,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                                 : (field.value ?? "")
                             }
                             placeholder="Escolha uma data"
+                            autoComplete="off"
                             onChange={(e) => {
                               const rawValue = e.target.value;
                               field.onChange(rawValue);

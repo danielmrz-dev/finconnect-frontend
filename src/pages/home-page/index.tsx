@@ -30,7 +30,7 @@ export const HomePage = () => {
   }, [transactions]);
 
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className="p-4 flex flex-col gap-4 mb-25">
       <h1 className="font-bold text-3xl">Resumo</h1>
       <div className="flex flex-col gap-3">
         <BalanceCard

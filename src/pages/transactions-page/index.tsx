@@ -35,13 +35,13 @@ export const TransactionsPage: React.FC = () => {
   }, [transactions, category]);
 
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className="p-4 flex flex-col gap-4 mb-25">
       <h1 className="font-bold text-3xl">Transações</h1>
       <div className="flex flex-col gap-6 bg-white p-6 rounded-lg shadow">
         <div className="flex flex-wrap items-center justify-between">
           <Select onValueChange={(v) => setCategory(v)}>
-            <SelectTrigger className="w-45 self-end">
-              <SelectValue placeholder="Filtrar por categoria" />
+            <SelectTrigger className="self-end">
+              <SelectValue placeholder="Filtrar" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -55,6 +55,12 @@ export const TransactionsPage: React.FC = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
+          <div className="self-end">
+            <TransactionDialog
+              action="create"
+              buttonText="Criar nova transação"
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-4">
           {isTransactionsLoading ? (
@@ -75,12 +81,6 @@ export const TransactionsPage: React.FC = () => {
           {!isTransactionsLoading &&
             filteredTransactions &&
             filteredTransactions.length <= 0 && <EmptyState />}
-        </div>
-        <div className="self-end">
-          <TransactionDialog
-            action="create"
-            buttonText="Criar nova transação"
-          />
         </div>
       </div>
     </div>

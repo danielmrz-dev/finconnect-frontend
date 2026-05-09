@@ -19,12 +19,9 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
     return {
       bgColor: cardBgColor === "light" ? "bg-white" : "bg-black",
       cardTextColor: cardBgColor === "light" ? "text-black" : "text-white",
-      amountColor:
-        Number(amount) < 0 || title === "Despesas"
-          ? "text-red-500"
-          : "text-green-500",
+      amountColor: cardBgColor === "light" ? "text-black" : "text-white",
     };
-  }, [cardBgColor, amount, title]);
+  }, [cardBgColor]);
 
   return (
     <div
@@ -33,7 +30,9 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
       <p className={`text-xs opacity-80 ${styles.cardTextColor}`}>{title}</p>
       <p className={`text-3xl font-extrabold ${styles.amountColor}`}>
         {isLoading ? (
-          <Skeleton className="h-9 w-full rounded-sm" />
+          <Skeleton className="h-9 w-full rounded-sm bg-gray-300" />
+        ) : title === "Despesas" ? (
+          `- ${formatToBRL(Number(amount))}`
         ) : (
           formatToBRL(Number(amount))
         )}

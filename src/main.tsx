@@ -8,6 +8,9 @@ import { Paths } from "./routes";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TransactionsContextProvider } from "./contexts/transactions-provider";
+import { Navbar } from "./components/navbar";
+import { ProfessionalsPage } from "./pages/professionals-page";
+import { NotFoundPage } from "./pages/not-found-page";
 
 const root = document.getElementById("root");
 
@@ -23,7 +26,10 @@ ReactDOM.createRoot(root!).render(
               <Route index element={<HomePage />} />
             </Route>
             <Route path={Paths.Transactions} element={<TransactionsPage />} />
+            <Route path={Paths.Professionals} element={<ProfessionalsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
+          <Navbar/>
         </TooltipProvider>
       </BrowserRouter>
     </TransactionsContextProvider>
