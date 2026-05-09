@@ -7,15 +7,20 @@ import {
 } from "../ui/empty";
 import { Spinner } from "../ui/spinner";
 
-export const Loader: React.FC = () => {
+type LoaderProps = {
+  title: string;
+  description: string;
+}
+
+export const Loader: React.FC<LoaderProps> = ({ description, title }) => {
   return (
     <Empty className="w-full">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <Spinner />
         </EmptyMedia>
-        <EmptyTitle>Carregando as transações</EmptyTitle>
-        <EmptyDescription>Por favor, aguarde...</EmptyDescription>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

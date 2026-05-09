@@ -64,7 +64,10 @@ export const TransactionsPage: React.FC = () => {
         </div>
         <div className="flex flex-col gap-4">
           {isTransactionsLoading ? (
-            <Loader />
+            <Loader 
+              title="Carregando transações..." 
+              description="Por favor, aguarde." 
+            />
           ) : (
             filteredTransactions &&
             filteredTransactions.length > 0 &&

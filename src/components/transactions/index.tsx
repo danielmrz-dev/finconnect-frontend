@@ -31,7 +31,10 @@ export const Transactions: React.FC<TransactionsProps> = ({
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           {isLoading ? (
-            <Loader />
+            <Loader
+              title="Carregando transações..."
+              description="Por favor, aguarde."
+            />
           ) : (
             transactions &&
             transactions.length > 0 &&
