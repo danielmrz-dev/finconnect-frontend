@@ -4,6 +4,7 @@ import type { ICreateTransactionPayload } from "@/types/create-transaction-paylo
 import type { IUpdateTransactionPayload } from "@/types/update-transaction-payload";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const useTransactions = () => {
   const { setTransactions } = useTransactionsContext();
@@ -35,8 +36,19 @@ export const useTransactions = () => {
     },
     onSuccess: () => {
       setChangeTrigger((prev) => prev + 1);
+      toast.success("Solicitação processada com sucesso.", {
+        description: "A transação foi excluída e não aparecerá mais na lista.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
     },
-    onError: () => {},
+    onError: () => {
+      toast.error("Houve um erro ao excluir a transação.", {
+        description: "Tente novamente mais tarde.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
+    },
   });
 
   type UpdateMutate = {
@@ -55,8 +67,19 @@ export const useTransactions = () => {
     },
     onSuccess: () => {
       setChangeTrigger((prev) => prev + 1);
+      toast.success("Solicitação processada com sucesso.", {
+        description: "A transação foi atualizada.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
     },
-    onError: () => {},
+    onError: () => {
+      toast.error("Houve um erro ao atualizar a transação.", {
+        description: "Tente novamente mais tarde.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
+    },
   });
 
   const {
@@ -70,8 +93,19 @@ export const useTransactions = () => {
     },
     onSuccess: () => {
       setChangeTrigger((prev) => prev + 1);
+      toast.success("Solicitação processada com sucesso.", {
+        description: "A transação foi criada.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
     },
-    onError: () => {},
+    onError: () => {
+      toast.error("Houve um erro ao criar a transação.", {
+        description: "Tente novamente mais tarde.",
+        position: "top-center",
+        className: "max-w-fit m-auto"
+      });
+    },
   });
 
   return {

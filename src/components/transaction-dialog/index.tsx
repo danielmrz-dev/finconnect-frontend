@@ -110,47 +110,39 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
     }
   }, [isCreationDialog, transactionToEdit, form]);
 
-  const onSubmit = () => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (action === "create") {
-      handleCreateTransaction();
+      if (!user) throw new Error("User not found");
+
+      const payload: ICreateTransactionPayload = {
+        categoria: data.tipo,
+        descricao: data.descricao,
+        valor: data.valor,
+        data: data.data,
+        usuarioId: user.id,
+      };
+
+      await createTransaction(payload);
     }
+
     if (action === "edit") {
-      handleUpdateTransaction();
+      if (!transactionId) {
+        throw new Error("Transaction ID not provided.");
+      }
+
+      const payload: IUpdateTransactionPayload = {
+        categoria: data.tipo,
+        descricao: data.descricao,
+        valor: data.valor,
+        data: data.data,
+      };
+
+      await updateTransaction({
+        id: transactionId,
+        payload,
+      });
     }
-  };
 
-  const handleCreateTransaction = async () => {
-    if (!user) throw new Error("User not found");
-
-    const formData = form.getValues();
-    const payload = {
-      categoria: formData.tipo,
-      descricao: formData.descricao,
-      valor: formData.valor,
-      data: formData.data,
-      usuarioId: user.id,
-    } satisfies ICreateTransactionPayload;
-
-    await createTransaction(payload);
-    setIsOpen(false);
-    form.reset();
-  };
-
-  const handleUpdateTransaction = async () => {
-    if (!transactionId) throw new Error("Transaction ID not provided.");
-
-    const formData = form.getValues();
-    const payload = {
-      categoria: formData.tipo,
-      descricao: formData.descricao,
-      valor: formData.valor,
-      data: formData.data,
-    } satisfies IUpdateTransactionPayload;
-
-    await updateTransaction({
-      id: transactionId,
-      payload,
-    });
     setIsOpen(false);
     form.reset();
   };
@@ -164,10 +156,11 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild className="cursor-pointer">
-        <Button 
+        <Button
           className={action === "create" ? "" : "w-7 h-7"}
-          variant={action === "delete" ? "destructive" : "secondary"} 
-          onClick={() => setIsOpen(true)}>
+          variant={action === "delete" ? "destructive" : "secondary"}
+          onClick={() => setIsOpen(true)}
+        >
           {buttonText}
         </Button>
       </DialogTrigger>
@@ -395,7 +388,7 @@ export const TransactionDialog: React.FC<TransactionDialogProps> = ({
                 form="form-rhf-demo"
                 className="w-fit cursor-pointer"
                 disabled={!isDirty || !isValid || isUpdateTransactionPending}
-                onClick={handleUpdateTransaction}
+                // onClick={handleUpdateTransaction}
               >
                 {isUpdateTransactionPending ? (
                   <div className="flex items-center gap-1">
