@@ -49,7 +49,7 @@ export const Transactions: React.FC<TransactionsProps> = ({
             })
           )}
           {!isLoading && transactions && transactions.length <= 0 && (
-            <EmptyState />
+            <EmptyState title="Não há transações cadastradas." description="Cadastre uma nova transação e ela será listada aqui." />
           )}
         </div>
       </div>
