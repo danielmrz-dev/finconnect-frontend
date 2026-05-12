@@ -7,6 +7,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Paths } from "@/routes";
 import { TbError404 } from "react-icons/tb";
 import { useNavigate } from "react-router";
 
@@ -27,7 +28,7 @@ export const NotFoundPage: React.FC = () => {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <Button onClick={() => navigateTo(-1)}>Voltar</Button>
+        <Button onClick={() => navigateTo(Paths.Home)}>Voltar para página inicial</Button>
       </EmptyContent>
     </Empty>
   );

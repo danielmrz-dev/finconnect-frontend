@@ -1,9 +1,9 @@
 import { useTransactionsContext } from "@/contexts/transactions-context";
+import { useTransactions } from "@/hooks/useTransactions";
 import { ETransactionType } from "@/types/transaction-type";
 import { useMemo } from "react";
 import { BalanceCard } from "../../components/balance-card";
 import { Transactions } from "../../components/transactions";
-import { useTransactions } from "@/hooks/useTransactions";
 
 export const HomePage = () => {
   const { isTransactionsLoading } = useTransactions();
@@ -30,7 +30,7 @@ export const HomePage = () => {
   }, [transactions]);
 
   return (
-    <div className="p-4 flex flex-col gap-4 mb-25">
+    <div className="p-4 flex flex-col gap-4 mb-25 md:ml-32">
       <h1 className="font-bold text-3xl">Resumo</h1>
       <div className="flex flex-col gap-3">
         <BalanceCard
@@ -52,7 +52,10 @@ export const HomePage = () => {
           isLoading={isTransactionsLoading}
         />
       </div>
-      <Transactions transactions={transactions} isLoading={isTransactionsLoading}/>
+      <Transactions
+        transactions={transactions}
+        isLoading={isTransactionsLoading}
+      />
     </div>
   );
 };

@@ -9,33 +9,27 @@ import {
 } from "@/components/ui/select";
 import { useTransactionsContext } from "@/contexts/transactions-context";
 import { useSpecialists } from "@/hooks/useSpecialists";
-import type { ISpecialist } from "@/types/specialist";
 import { MapperSpecialistArea } from "@/utils/mapper-specialist-area";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const ProfessionalsPage: React.FC = () => {
   const { specialists, specialistsAreas } = useTransactionsContext();
   const { isSpecialistsLoading } = useSpecialists();
 
-  const [filteredSpecialists, setFilteredSpecialists] =
-    useState<ISpecialist[]>(specialists);
+  const [selectedArea, setSelectedArea] = useState<string>("Todas");
 
-  const filterSpecialistsByArea = (areaDeAtuacaoId: string) => {
-    if (areaDeAtuacaoId === "Todas") {
-      setFilteredSpecialists(specialists);
-    } else {
-      const filteredSpecialists = specialists.filter((specialist) => {
-        return specialist.areaAtuacaoId === +areaDeAtuacaoId;
-      });
-      setFilteredSpecialists(filteredSpecialists);
-    }
-  };
+  const filteredSpecialists = useMemo(() => {
+    if (selectedArea === "Todas") return specialists;
+    return specialists.filter(
+      (s) => s.areaAtuacaoId.toString() === selectedArea,
+    );
+  }, [specialists, selectedArea]);
 
   return (
-    <div className="p-4 flex flex-col gap-4 mb-25">
+    <div className="p-4 flex flex-col gap-4 mb-25 md:ml-32">
       <h1 className="font-bold text-3xl">Profissionais</h1>
       <div className="flex flex-col gap-4 p-6 rounded-lg shadow bg-white">
-        <Select onValueChange={(v) => filterSpecialistsByArea(v)}>
+        <Select onValueChange={(v) => setSelectedArea(v)}>
           <SelectTrigger className="self-start">
             <SelectValue placeholder="Filtrar por área de atuação" />
           </SelectTrigger>
@@ -43,7 +37,7 @@ export const ProfessionalsPage: React.FC = () => {
             <SelectGroup>
               <SelectItem value="Todas">Todas</SelectItem>
               {specialistsAreas.map((area) => (
-                <SelectItem value={area.id.toString()}>
+                <SelectItem key={area.id} value={area.id.toString()}>
                   {MapperSpecialistArea[area.nome]}
                 </SelectItem>
               ))}

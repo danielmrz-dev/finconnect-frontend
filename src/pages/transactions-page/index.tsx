@@ -38,7 +38,7 @@ export const TransactionsPage: React.FC = () => {
   return (
     <>
       <Toaster />
-      <div className="p-4 flex flex-col gap-4 mb-25">
+      <div className="p-4 flex flex-col gap-4 mb-25 md:ml-32">
         <h1 className="font-bold text-3xl">Transações</h1>
         <div className="flex flex-col gap-6 bg-white p-6 rounded-lg shadow">
           <div className="flex flex-wrap items-center justify-between">

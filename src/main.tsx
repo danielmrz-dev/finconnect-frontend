@@ -7,10 +7,10 @@ import { TransactionsPage } from "./pages/transactions-page";
 import { Paths } from "./routes";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TransactionsContextProvider } from "./contexts/transactions-provider";
 import { Navbar } from "./components/navbar";
-import { ProfessionalsPage } from "./pages/professionals-page";
+import { TransactionsContextProvider } from "./contexts/transactions-provider";
 import { NotFoundPage } from "./pages/not-found-page";
+import { ProfessionalsPage } from "./pages/professionals-page";
 
 const root = document.getElementById("root");
 
@@ -21,6 +21,7 @@ ReactDOM.createRoot(root!).render(
     <TransactionsContextProvider>
       <BrowserRouter>
         <TooltipProvider>
+          <Navbar />
           <Routes>
             <Route path={Paths.Home} element={<App />}>
               <Route index element={<HomePage />} />
@@ -29,7 +30,6 @@ ReactDOM.createRoot(root!).render(
             <Route path={Paths.Professionals} element={<ProfessionalsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-          <Navbar/>
         </TooltipProvider>
       </BrowserRouter>
     </TransactionsContextProvider>
