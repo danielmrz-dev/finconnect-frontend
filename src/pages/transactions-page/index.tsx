@@ -86,7 +86,12 @@ export const TransactionsPage: React.FC = () => {
             )}
             {!isTransactionsLoading &&
               filteredTransactions &&
-              filteredTransactions.length <= 0 && <EmptyState />}
+              filteredTransactions.length <= 0 && (
+                <EmptyState
+                  title="Não há transações."
+                  description="Você ainda não tem transações cadastradas."
+                />
+              )}
           </div>
         </div>
       </div>

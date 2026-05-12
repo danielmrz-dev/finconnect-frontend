@@ -7,16 +7,21 @@ import {
   EmptyTitle,
 } from "../ui/empty";
 
-export const EmptyState: React.FC = () => {
+type EmptyStateProps = {
+  title: string;
+  description: string;
+};
+
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, description }) => {
   return (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <GlassesIcon />
         </EmptyMedia>
-        <EmptyTitle>Não há transações cadastradas</EmptyTitle>
+        <EmptyTitle>{title}</EmptyTitle>
         <EmptyDescription>
-          Você ainda não cadastrou nenhuma transação.
+          {description}
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

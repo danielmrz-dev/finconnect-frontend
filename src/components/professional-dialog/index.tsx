@@ -1,3 +1,4 @@
+import type { ISpecialist } from "@/types/specialist";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -9,51 +10,49 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { MapperSpecialistAreaIdToText } from "@/utils/mapper-specialist-area";
+import { phoneNumberFormatter } from "@/utils/phone-number-formatter";
 
 type ProfessionalsDialogProps = {
   trigger: React.ReactNode;
-}
+  professional: ISpecialist;
+};
 
-export const ProfessionalsDialog: React.FC<ProfessionalsDialogProps> = ({ trigger }) => {
+export const ProfessionalsDialog: React.FC<ProfessionalsDialogProps> = ({
+  trigger,
+  professional,
+}) => {
   return (
     <Dialog>
       <form>
-        <DialogTrigger asChild>
-          {trigger}
-        </DialogTrigger>
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Informações sobre o profissional</DialogTitle>
             <DialogDescription className="flex flex-col gap-2 pt-2">
               <strong className="flex justify-between">
                 Nome:
-                <span>
-                  Informação
-                </span>
+                <span>{professional.nome}</span>
               </strong>
               <strong className="flex justify-between">
                 Área de atuação:
-                <span>
-                  Informação
-                </span>
+                <span>{MapperSpecialistAreaIdToText[professional.areaAtuacaoId]}</span>
               </strong>
               <strong className="flex justify-between">
                 Telefone:
-                <span>
-                  Informação
-                </span>
+                <span>{phoneNumberFormatter(professional.nrTelefone)}</span>
               </strong>
               <strong className="flex justify-between">
                 Email:
-                <span>
-                  Informação
-                </span>
+                <span>{professional.email}</span>
               </strong>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" className="w-fit self-end">Fechar</Button>
+              <Button variant="outline" className="w-fit self-end">
+                Fechar
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
